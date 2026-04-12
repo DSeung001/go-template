@@ -1,10 +1,11 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 	"go-template/pkg/logger"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 func RequestLogger() gin.HandlerFunc {
@@ -20,6 +21,7 @@ func RequestLogger() gin.HandlerFunc {
 			"ip":         c.ClientIP(),
 			"latency":    latency.Milliseconds(),
 			"user_agent": c.Request.UserAgent(),
+			"request-id": c.GetString("RequestID"),
 		}).Info("request_completed")
 	}
 }
