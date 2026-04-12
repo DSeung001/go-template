@@ -5,13 +5,15 @@ import (
 	"github.com/google/uuid"
 )
 
+const RequestIDHeader = "RequestID"
+
 func RequestIDMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requestID := c.Request.Header.Get("X-Request-Id")
 		if requestID == "" {
 			requestID = uuid.New().String()
 		}
-		c.Set("RequestID", requestID)
+		c.Set(RequestIDHeader, requestID)
 		c.Header("X-Request-Id", requestID)
 		c.Next()
 	}

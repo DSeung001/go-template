@@ -21,7 +21,7 @@ func RequestLogger() gin.HandlerFunc {
 			"ip":         c.ClientIP(),
 			"latency":    latency.Milliseconds(),
 			"user_agent": c.Request.UserAgent(),
-			"request-id": c.GetString("RequestID"),
+			"request-id": c.GetString(RequestIDHeader),
 		}).Info("request_completed")
 	}
 }

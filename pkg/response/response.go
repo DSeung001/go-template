@@ -1,4 +1,4 @@
-package pkg
+package response
 
 import (
 	"github.com/gin-gonic/gin"
@@ -13,6 +13,13 @@ type Response struct {
 
 func Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Response{
+		Success: true,
+		Data:    data,
+	})
+}
+
+func Created(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusCreated, Response{
 		Success: true,
 		Data:    data,
 	})
