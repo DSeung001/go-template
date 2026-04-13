@@ -19,7 +19,7 @@ import (
 
 func main() {
 	// Infra
-	mysqlConn, err := db.NewMySQL("root:root@tcp(localhost:3306)/template_db")
+	mysqlConn, err := db.NewMySQL("root:root@tcp(localhost:3306)/template_db?parseTime=true")
 	if err != nil {
 		log.Fatalf("failed to connect to mysql: %v", err)
 	}
@@ -44,29 +44,25 @@ func main() {
 	r.Use(middleware.RequestLogger())
 
 	// Route
-	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "ok"})
-	})
-
-	r.GET("/health/ready", handler.Health(mysqlConn, redisClient))
-
-	r.GET("/debug/panic", func(c *gin.Context) {
-		panic("forced panic for recovery testing")
-	})
+	{
+		health := r.Group("/health")
+		health.GET("/", func(c *gin.Context) { c.JSON(200, gin.H{"message": "ok"}) })
+		health.GET("/ready", handler.Health(mysqlConn, redisClient))
+	}
 
 	// Server
 	srv := &http.Server{
 		Addr:    "localhost:8080",
 		Handler: r,
 	}
-	
+
 	if err := runServer(srv, 5*time.Second); err != nil {
 		log.Printf("server exited with error: %v", err)
 		os.Exit(1)
 	}
 	log.Println("server exited")
 	os.Exit(0)
-}	
+}
 
 func runServer(srv *http.Server, shutdownTimeout time.Duration) error {
 	errCh := make(chan error, 1)
