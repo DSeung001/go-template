@@ -17,6 +17,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+const shutdownTimeout = 5 * time.Second
+
 func main() {
 	// Infra
 	mysqlConn, err := db.NewMySQL("root:root@tcp(localhost:3306)/template_db?parseTime=true")
@@ -56,7 +58,7 @@ func main() {
 		Handler: r,
 	}
 
-	if err := runServer(srv, 5*time.Second); err != nil {
+	if err := runServer(srv); err != nil {
 		log.Printf("server exited with error: %v", err)
 		os.Exit(1)
 	}
@@ -64,7 +66,7 @@ func main() {
 	os.Exit(0)
 }
 
-func runServer(srv *http.Server, shutdownTimeout time.Duration) error {
+func runServer(srv *http.Server) error {
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- srv.ListenAndServe()
